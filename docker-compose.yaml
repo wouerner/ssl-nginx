@@ -1,33 +1,56 @@
 version: '3'
 services:
   nginx:
-    image: nginx:latest
+    # image: nginx:latest
+    build: .
     ports:
       - "80:80"
-      # - "443:443"
-    # volumes:
-      # - ./nginx:/etc/nginx/conf.d
-      # - ./data/certbot/conf:/etc/letsencrypt
-      # - ./data/certbot/www:/var/www/certbot
-      #
+      - "443:443"
+    working_dir: /app
     volumes:
+      - .:/app
       - ./site:/var/www/html
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-    command: [nginx, '-g', 'daemon off;']
+      # - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      # - ./nginx:/etc/nginx/conf.d/
+      # - ./ssl:/etc/ssl
+      #entrypoint: /app/entrypoint.sh
+    # command: [nginx, '-g', 'daemon off;']
+    # depends_on:
+    #   - "ssl"
+  # ssl:
+  #   image: frapsoft/openssl
+  #   working_dir: /app
+  #   volumes:
+  #     - .:/app
+  #   command:
+  #     - openssl
+  #     - req
+  #     - -x509
+  #     - -nodes
+  #     - -days 365
+  #     - -newkey
+  #     - rsa:2048
+  #     - -keyout
+  #     - /app/ssl/private/selfsigned.key
+  #     - -out
+  #     - /app/ssl/certs/selfsigned.crt
+  #     - -subj
+  #     - "/C=br/ST=br/L=br/O=br/OU=docker/CN=localhost.teste"
 
   # certbot:
   #   image: certbot/certbot
   #   volumes:
   #     - ./data/certbot/conf:/etc/letsencrypt
   #     - ./data/certbot/www:/var/www/certbot
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - ./letsencrypt/etc:/etc/letsencrypt
-      - ./letsencrypt/var:/var/lib/letsencrypt
-      - ./site:/var/www/html
-    depends_on:
-      - nginx
-    command: certonly --webroot --webroot-path=/var/www/html --email wouerner@protonmail.com --agree-tos --no-eff-email --staging -d wouerner.in 
+  # certbot:
+  #   image: certbot/certbot
+  #   container_name: certbot
+  #   volumes:
+  #     - ./letsencrypt/etc:/etc/letsencrypt
+  #     - ./letsencrypt/var:/var/lib/letsencrypt
+  #     - ./site:/var/www/html
+  #   depends_on:
+  #     - nginx
+  #   # command: certonly --webroot --webroot-path=/var/www/html --email wouerner@protonmail.com --agree-tos --no-eff-email --staging -d nextcloud.wouerner.in --manual
+  #   command: certonly  --preferred-challenges dns --webroot-path=/var/www/html --email wouerner@protonmail.com --agree-tos --no-eff-email --staging -d daytrade.reviews --manual
 
